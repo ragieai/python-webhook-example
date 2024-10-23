@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import json
 import os
 
 from dotenv import load_dotenv
@@ -33,6 +32,7 @@ def validate_signature(secret_key: str, payload_body: bytes, received_signature:
 class WebhookPayload(BaseModel):
     type: str
     payload: dict
+    nonce: str
 
 @app.post("/webhook")
 async def handle_webhook(
@@ -57,15 +57,21 @@ async def handle_webhook(
         # Signature mismatch; reject the request
         raise HTTPException(status_code=401, detail="Invalid signature")
     
-    print("Webhook received and verified successfully", payload.type, payload.payload)
+
+    # TODO: Ensure that the nonce has not been processed yet
+    
+    print("Webhook received and verified successfully", payload.type, payload.payload, payload.nonce)
 
     # Handle the webhook event as needed
     match payload.type:
         case "document_status_updated":
-            # Handle event type 1
+            # Handle document_status_updated event
             pass
         case "document_deleted":
-            # Handle event type 2
+            # Handle document_deleted event
+            pass
+        case "entity_extracted":
+            # Handle entity_extracted event
             pass
         case _:
             # Handle unknown event types
